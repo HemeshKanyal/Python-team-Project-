@@ -24,7 +24,6 @@ clock = pygame.time.Clock()
 
 img = pygame.image.load('1.jpg').convert()
 
-
 def detect_collision(dx, dy, ball, rect):
     if dx > 0:
         delta_x = ball.right - rect.left
@@ -40,14 +39,74 @@ def detect_collision(dx, dy, ball, rect):
     elif delta_x > delta_y:
         dy = -dy
     elif delta_y > delta_x:
-        dx = - dx
+        dx = -dx
     return dx, dy
 
+def show_start_screen():
+    while True:
+        sc.fill(pygame.Color('black'))
+        font = pygame.font.SysFont('Arial', 80)
+        text = font.render("WELCOME TO THE GAME!", True, pygame.Color('white'))
+        sc.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - 200))
+
+        button_font = pygame.font.SysFont('Arial', 50)
+        play_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT // 2, 300, 80)
+        pygame.draw.rect(sc, pygame.Color('blue'), play_button)
+        play_text = button_font.render("PLAY", True, pygame.Color('white'))
+        sc.blit(play_text, (play_button.x + play_button.width // 2 - play_text.get_width() // 2, play_button.y + 10))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if play_button.collidepoint(event.pos):
+                    return  # Start the game when "Play" is clicked
+
+        pygame.display.flip()
+        clock.tick(30)
+
+def show_end_screen(message):
+    while True:
+        sc.fill(pygame.Color('black'))
+        font = pygame.font.SysFont('Arial', 60)
+        text = font.render(message, True, pygame.Color('white'))
+        sc.blit(text, (WIDTH // 2 - text.get_width() // 2, HEIGHT // 2 - 100))
+
+        button_font = pygame.font.SysFont('Arial', 40)
+        replay_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT // 2, 300, 60)
+        quit_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT // 2 + 100, 300, 60)
+
+        pygame.draw.rect(sc, pygame.Color('green'), replay_button)
+        pygame.draw.rect(sc, pygame.Color('red'), quit_button)
+
+        replay_text = button_font.render("REPLAY", True, pygame.Color('black'))
+        quit_text = button_font.render("QUIT", True, pygame.Color('black'))
+
+        sc.blit(replay_text, (replay_button.x + replay_button.width // 2 - replay_text.get_width() // 2, replay_button.y + 10))
+        sc.blit(quit_text, (quit_button.x + quit_button.width // 2 - quit_text.get_width() // 2, quit_button.y + 10))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if replay_button.collidepoint(event.pos):
+                    return True
+                if quit_button.collidepoint(event.pos):
+                    pygame.quit()
+                    exit()
+
+        pygame.display.flip()
+        clock.tick(30)
+
+show_start_screen()
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
+
     sc.blit(img, (0, 0))
 
     [pygame.draw.rect(sc, color_list[color], block) for color, block in enumerate(block_list)]
@@ -75,11 +134,25 @@ while True:
         fps += 2
 
     if ball.bottom > HEIGHT:
-        print('GAME OVER!')
-        exit()
+        if show_end_screen("GAME OVER!"):
+            paddle = pygame.Rect(WIDTH // 2 - paddle_w // 2, HEIGHT - paddle_h - 10, paddle_w, paddle_h)
+            ball = pygame.Rect(rnd(ball_rect, WIDTH - ball_rect), HEIGHT // 2, ball_rect, ball_rect)
+            dx, dy = 1, -1
+            block_list = [pygame.Rect(10 + 120 * i, 10 + 70 * j, 100, 50) for i in range(10) for j in range(4)]
+            color_list = [(rnd(30, 256), rnd(30, 256), rnd(30, 256)) for i in range(10) for j in range(4)]
+            fps = 60
+        else:
+            exit()
     elif not len(block_list):
-        print('WIN!!')
-        exit()
+        if show_end_screen("YOU WIN!!"):
+            paddle = pygame.Rect(WIDTH // 2 - paddle_w // 2, HEIGHT - paddle_h - 10, paddle_w, paddle_h)
+            ball = pygame.Rect(rnd(ball_rect, WIDTH - ball_rect), HEIGHT // 2, ball_rect, ball_rect)
+            dx, dy = 1, -1
+            block_list = [pygame.Rect(10 + 120 * i, 10 + 70 * j, 100, 50) for i in range(10) for j in range(4)]
+            color_list = [(rnd(30, 256), rnd(30, 256), rnd(30, 256)) for i in range(10) for j in range(4)]
+            fps = 60
+        else:
+            exit()
 
     key = pygame.key.get_pressed()
     if key[pygame.K_LEFT] and paddle.left > 0:
