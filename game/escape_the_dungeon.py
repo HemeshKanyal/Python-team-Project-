@@ -4,8 +4,7 @@ inventory = []
 player_stats = {
     "health": 100,
     "attack": 10,
-    "disarm_skill": 1,
-    "gold": 100 
+    "disarm_skill": 1
 }
 
 enemy_stats = {
@@ -271,37 +270,7 @@ dungeon_map = [
     ["NPC - Merchant", "NPC - Quest Giver", "Exit"]
 ]
 
-def display_map():
-    print("Dungeon Map:")
-    for r, row in enumerate(dungeon_map):
-        for c, room in enumerate(row):
-            if [r, c] == player_position:
-                print("P", end=" ")  
-            else:
-                print("?", end=" ") 
-        print()
-
 player_position = [0, 0]
-
-def search_room():
-    print("You search the room...")
-    discoveries = [
-        "You found a gold coin!",
-        "You discovered a healing potion!",
-        "You found nothing of interest.",
-        "You uncovered a hidden clue about the dungeon's exit!",
-    ]
-    discovery = random.choice(discoveries)
-    print(discovery)
-
-    if "gold coin" in discovery:
-        player_stats["gold"] += 10
-        print("You gained 10 gold! Current gold: {}".format(player_stats["gold"]))
-    elif "healing potion" in discovery:
-        inventory.append("Healing Potion")
-        print("You added a Healing Potion to your inventory.")
-    elif "hidden clue" in discovery:
-        print("The clue says: 'The exit is in the southeast corner of the map.'")
 
 def move_player(direction):
     global player_position
@@ -342,7 +311,7 @@ def move_player(direction):
     elif room_type == "NPC - Quest Giver":
         npc_quest_giver()
     elif room_type == "Exit":
-        exit_room()
+        exit_room("You find the exit! You've escaped the dungeon.")
 
 def main():
     print("Welcome to the Escape the Dungeon Game!")
@@ -350,31 +319,28 @@ def main():
     running = True
 
     while running:
-        print("\nPlayer Stats: ")
-        print(f"Health: {player_stats['health']}, Gold: {player_stats['gold']}, Inventory: {inventory}")
         print("\nYou are in a dark room. What would you like to do?")
         print("1. Move")
-        print("2. Search the room")
+        #print("2. Search the room")
         print("3. Check inventory")
-        print("4. View map")
-        print("5. Exit game")
+        print("4. Exit game")
 
-        choice = input("Enter your choice (1-5): ")
+        choice = input("Enter your choice (1-4): ")
 
         if choice == "1":
             direction = input("Enter a direction to move (north/south/east/west): ").lower()
             move_player(direction)
         elif choice == "2":
-            search_room()
+            print("You search the room but find nothing interesting.")
         elif choice == "3":
+            print("You check your inventory. It's empty for now.")
             view_inventory()
+
         elif choice == "4":
-            display_map()
-        elif choice == "5":
             print("Exiting game. Goodbye!")
             running = False
         else:
-            print("Invalid choice. Please select an option from 1 to 5.")
+            print("Invalid choice. Please select an option from 1 to 4.")
 
 if __name__ == "__main__":
     main()
